@@ -51,7 +51,9 @@ route.post('/login', userController.logIn)
 
 
 
-route.get('/profile', isAuth, userController.getOneUser )
+route.get('/profile', isAuth, userController.getUserProfile )
 
+
+route.get('/one-user/:id',  userController.getOneUser)
 
 module.exports = route

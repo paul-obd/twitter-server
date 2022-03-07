@@ -5,6 +5,9 @@ GET http://localhost:3000/images/2022-02-26T14-57-05.461Z-ball_100x100.jpg HTTP/
 
 ####
 
+GET http://localhost:3000/posts/one-post/622386001f548ed5a203b4f0 HTTP/1.1
+
+####
 
 
 POST http://localhost:3000/user/signup HTTP/1.1

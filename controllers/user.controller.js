@@ -96,9 +96,31 @@ exports.logIn = async (req, res, next)=>{
     }
 }
 
-exports.getOneUser =  async (req, res, next)=>{
+exports.getUserProfile =  async (req, res, next)=>{
     try {
         let userId = req.userId
+        const result = await User.findById(userId)
+        if(!result){
+            let err = new Error('user not found')
+            err.statusCode = 404
+            throw err
+        }
+
+        res.send(result)
+        
+    } catch (err) {
+        if(!err.statusCode){
+            err.statusCode = 500
+        }
+        next(err)
+
+        
+    }
+}
+
+exports.getOneUser = async (req, res, next) =>{
+    try {
+        let userId = req.params.id
         const result = await User.findById(userId)
         if(!result){
             let err = new Error('user not found')
