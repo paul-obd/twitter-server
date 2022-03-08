@@ -21,7 +21,7 @@ router.post('/add-post',  isAuth, [
 
 router.put('/put-post/:id', isAuth,postsController.updatePost)
 
-
+router.delete('/delete-post/:id', isAuth, postsController.deletePost)
 
 
 

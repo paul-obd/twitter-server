@@ -4,6 +4,7 @@ const fs = require('fs')
 const User = require('../models/user.model')
 const { validationResult } = require('express-validator')
 
+
 exports.getAllPosts = async (req, res, next) => {
     try {
         const result = await Posts.find()
@@ -109,12 +110,12 @@ exports.updatePost = async (req, res, next) => {
 
         let postToBeUpdated = await Posts.findById(postId)
         if (!postToBeUpdated) {
-            let err = new Error('unavailable post to be updated')
+            let err = new Error('unavailable post to be updated.')
             err.statusCode = 404
             throw err
         }
         if (postToBeUpdated.creator.toString() !== req.userId) {
-            let err = new Error('Update Rejected! Your not the vreator of this post')
+            let err = new Error('Update Rejected! You are not the creator of this.')
             err.statusCode = 401
             throw err
 
@@ -148,7 +149,16 @@ exports.updatePost = async (req, res, next) => {
                 creator: req.userId
             }
 
-        } else if (!req.file && !req.body.imageUrl) {
+        } else if (!req.file && !req.body.imageUrl && req.body.removedImg) {
+            clearImage(req.body.removedImg)
+            post = {
+                title: req.body.title,
+                imageUrl: null,
+                content: req.body.content,
+                creator: req.userId
+            }
+        }
+         else if (!req.file && !req.body.imageUrl) {
             post = {
                 title: req.body.title,
                 content: req.body.content,
@@ -160,7 +170,7 @@ exports.updatePost = async (req, res, next) => {
 
 
         let result = await Posts.findOneAndUpdate({ _id: postId }, post, option)
-        res.send(result)
+        res.send({message: "Updated successfully!", post: result})
 
     } catch (err) {
 
@@ -177,7 +187,8 @@ exports.updatePost = async (req, res, next) => {
 const clearImage = (filePath) => {
 
     filePath = path.join(__dirname, '..', filePath)
-    fs.unlink(filePath, err => console.log('fs: err' + err))
+   
+    fs.unlink(filePath, err => {})
 
 }
 
@@ -186,9 +197,34 @@ const clearImage = (filePath) => {
 exports.deletePost = async (req, res, next) => {
     try {
         const postId = req.params.id
+        const postToBeDeleted = await Posts.findById(postId)
+        if(!postToBeDeleted)
+        {
+            let err = new Error('Tweet cannot be found.')
+            err.statusCode = 404
+            throw err
+        }
+        if(postToBeDeleted.creator.toString() !== req.userId){
+            let err = new Error('Delete Rejected! You are not the creator of this post.')
+            err.statusCode = 401
+            throw err
+        }
+
+        const deletedPost = await Posts.findByIdAndDelete(postId, { new: true })
+        const creator = await User.findById(req.userId)
+        creator.posts.pull(postId)
+        creator.save()
+
+
+        res.send({message: "Deleted successfully!", post: deletedPost})
 
 
     } catch (err) {
+
+        if(!err.statusCode){
+            err.statusCode = 500
+        }
+        next(err)
 
     }
 }
