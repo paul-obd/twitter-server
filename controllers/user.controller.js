@@ -2,7 +2,8 @@ const User = require('../models/user.model');
 const {validationResult} = require('express-validator')
 const bcrypt = require ('bcryptjs');
 const jwt = require('jsonwebtoken');
-const jwtSecret = require('../config/jwtsecret')
+const jwtSecret = require('../config/jwtsecret');
+const Posts = require('../models/post.model');
 
 
 exports.signUp = async (req, res, next)=>{
@@ -105,6 +106,13 @@ exports.getUserProfile =  async (req, res, next)=>{
             err.statusCode = 404
             throw err
         }
+        // let userPost = result.posts
+        // result.posts = []
+        // userPost.posts.forEach(post => {
+        //     let currentPost = await Posts.findById(post)
+        //     result.posts.push(currentPost)
+            
+        // });
 
         res.send(result)
         
