@@ -106,15 +106,31 @@ exports.getUserProfile =  async (req, res, next)=>{
             err.statusCode = 404
             throw err
         }
-        // let userPost = result.posts
-        // result.posts = []
-        // userPost.posts.forEach(post => {
-        //     let currentPost = await Posts.findById(post)
-        //     result.posts.push(currentPost)
-            
-        // });
+        
+        let userPosts = []
+   
+        for (let i = 0; i < result.posts.length; i++) {
+            const post = result.posts[i];
+            let currentPost = await Posts.findById(post)
+            if(currentPost.imageUrl){
+                currentPost.imageUrl = currentPost.imageUrl.toString().replace(/\\/g, "/")
+               
+            }
+            userPosts.push(currentPost)
+        }
 
-        res.send(result)
+        
+        
+    
+        res.send({
+            _id: result._id,
+            email: result.email,
+            password: result.password,
+            userName: result.userName,
+            posts: userPosts,
+            createdAt: result.createdAt,
+            updatedAt: result.updatedAt    
+        })
         
     } catch (err) {
         if(!err.statusCode){
@@ -135,8 +151,28 @@ exports.getOneUser = async (req, res, next) =>{
             err.statusCode = 404
             throw err
         }
+        let userPosts = []
+   
+        for (let i = 0; i < result.posts.length; i++) {
+            const post = result.posts[i];
+            let currentPost = await Posts.findById(post)
+            if(currentPost.imageUrl){
+                currentPost.imageUrl = currentPost.imageUrl.toString().replace(/\\/g, "/")
+                
+            }
+            userPosts.push(currentPost)
+        }
 
-        res.send(result)
+
+        res.send({
+            _id: result._id,
+            email: result.email,
+            password: result.password,
+            userName: result.userName,
+            posts: userPosts,
+            createdAt: result.createdAt,
+            updatedAt: result.updatedAt    
+        })
         
     } catch (err) {
         if(!err.statusCode){

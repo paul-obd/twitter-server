@@ -18,7 +18,26 @@ exports.getAllPosts = async (req, res, next) => {
             err.statusCode = 500
             throw err
         }
-        res.send(result)
+        let posts = []
+        for (let i = 0; i < result.length; i++) {
+            const post = result[i];
+            let user = await User.findById(post.creator)
+            let newPost = {
+                _id: post._id,
+                imageUrl: post.imageUrl,
+                content: post.content,
+                creator: user,
+                createdAt: post.createdAt,
+                updatedAt: post.updatedAt
+                
+            }
+            posts.push(newPost)
+
+            
+        }
+        
+
+        res.send(posts)
     } catch (err) {
         if (!err.statusCode) {
             err.statusCode = 500
@@ -41,8 +60,19 @@ exports.getOnePost = async (req, res, next) => {
             if (post.imageUrl) {
                 post.imageUrl = post.imageUrl.toString().replace(/\\/g, "/")
             }
+            let user = await User.findById(post.creator)
+            let newPost = {
+                _id: post._id,
+                imageUrl: post.imageUrl,
+                title: post.title,
+                content: post.content,
+                creator: user,
+                createdAt: post.createdAt,
+                updatedAt: post.updatedAt
+                
+            }
 
-            res.send(post)
+            res.send(newPost)
         }
 
     } catch (err) {
