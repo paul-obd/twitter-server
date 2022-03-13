@@ -25,6 +25,7 @@ exports.getAllPosts = async (req, res, next) => {
             let newPost = {
                 _id: post._id,
                 imageUrl: post.imageUrl,
+                title: post.title,
                 content: post.content,
                 creator: user,
                 createdAt: post.createdAt,

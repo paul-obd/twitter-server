@@ -56,4 +56,8 @@ route.get('/profile', isAuth, userController.getUserProfile )
 
 route.get('/one-user/:id',  userController.getOneUser)
 
+route.post('/forgot-password', userController.forgotPassword)
+
+route.put('/reset-password', userController.resetPassword)
+
 module.exports = route

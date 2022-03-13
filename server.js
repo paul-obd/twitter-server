@@ -6,6 +6,7 @@ const app = express()
 const bodyParser = require('body-parser'); 
 const cors = require('cors')
 const multer = require('multer')
+require("dotenv").config();
 
 //routes consts
 const productsRoutes = require('./routes/posts.routes')
@@ -72,7 +73,7 @@ app.use((err, req, res, next)=>{
 
 
 //connecting to db and statring the server
-mongoose.connect('mongodb+srv://paul:paul@cluster0.gieey.mongodb.net/myFirstDatabase?retryWrites=true&w=majority').then(
+mongoose.connect(process.env.DB).then(
      
     () => app.listen(3000, console.log('listening on port 3000 and connected to db'))
 )

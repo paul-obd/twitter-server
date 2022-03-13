@@ -9,6 +9,15 @@ GET http://localhost:3000/posts/one-post/622386001f548ed5a203b4f0 HTTP/1.1
 
 ####
 
+POST http://localhost:3000/user/forgot-password HTTP/1.1
+Content-Type: application/json
+
+{
+    "email": "paul.bus.obd@gmail.com"
+}
+
+####
+
 
 POST http://localhost:3000/user/signup HTTP/1.1
 Content-Type: application/json
