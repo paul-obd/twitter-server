@@ -7,7 +7,19 @@ const { validationResult } = require('express-validator')
 
 exports.getAllPosts = async (req, res, next) => {
     try {
-        const result = await Posts.find()
+
+        let {page, size} = req.query;
+        if(!page){
+            page = 1
+        } 
+        if(!size){
+            size = 6
+        }
+
+        const limit = parseInt(size)
+        const skip = (page - 1) * size
+
+        const result = await Posts.find().limit(limit).skip(skip)
         await result.forEach(tweet => {
             if (tweet.imageUrl) {
                 tweet.imageUrl = tweet.imageUrl.toString().replace(/\\/g, "/")

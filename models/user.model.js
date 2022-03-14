@@ -15,6 +15,10 @@ const userSchema = new Schema({
         type: String,
         required: true
     },
+    activated:{
+        type: Boolean,
+        default: false
+    },
     posts: [
         {
             type: Schema.Types.ObjectId,

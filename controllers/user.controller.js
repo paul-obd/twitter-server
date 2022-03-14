@@ -28,10 +28,20 @@ exports.signUp = async (req, res, next) => {
         })
 
         const result = await user.save()
-        res.status(201).send({ message: "You are registered! Please LogIn.", user: result })
 
+        const token = jwt.sign({
+            email: result.email,
+            userId: result._id,
+            userName: result.UserName
+        },
+            jwtSecret,
+            { expiresIn: '24h' }
+        )
 
-
+        mailSender.sendEmail(result.email, "Confirm You email", "", 
+        '<a href='+process.env.CLIENT+ 'account-verification'+'/'+token+'>Click this link to verify your account</a>'
+        )
+        res.status(201).send({ message: "Please check your email to verify Your Account", user: result })
 
 
 
@@ -55,7 +65,11 @@ exports.logIn = async (req, res, next) => {
         if (email) {
             user = await User.findOne({ email: email })
             if (!user) {
-                let err = new Error('A user with this email could not be found! Please SignUp')
+                let err = new Error('A user with this email could not be found! Please SignUp.')
+                err.statusCode = 402
+                throw err
+            }else if(user.activated == false){
+                let err = new Error('Your account is not activated! You have to confirm your email.')
                 err.statusCode = 402
                 throw err
             }
@@ -65,6 +79,10 @@ exports.logIn = async (req, res, next) => {
             if (!user) {
                 let err = new Error('A user with this username could not be found! Please SignUp')
                 err.statusCode = 401
+                throw err
+            }else if(user.activated == false){
+                let err = new Error('Your account is not activated! You have to confirm your email.')
+                err.statusCode = 402
                 throw err
             }
         }
@@ -182,6 +200,28 @@ exports.getOneUser = async (req, res, next) => {
         next(err)
 
 
+    }
+}
+
+exports.confirmEmail = async (req, res, next)=>{
+    try {
+        let userId = req.params.id
+        const user = await User.findById(userId)
+        if(!user){
+            let err = new Error('You are not a registered user!')
+            err.statusCode = 422
+            throw err
+        }
+        const option = { new: true }
+
+        const activatedUser = await User.findOneAndUpdate({_id: userId}, {activated: true}, option)
+        res.send({message: "Your Email is Confirmed Successfully! Please LogIn."})
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500
+        }
+        next(err)
+        
     }
 }
 

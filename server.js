@@ -11,6 +11,7 @@ require("dotenv").config();
 //routes consts
 const productsRoutes = require('./routes/posts.routes')
 const userRoutes = require('./routes/user.routes')
+const resetPasswordTokenRoutes = require('./routes/resetPasswordToken.routes')
 
 
 //multer consts
@@ -56,6 +57,8 @@ app.use('/images', express.static(path.join(__dirname, 'images')))
 app.use('/posts', productsRoutes )
 
 app.use('/user', userRoutes )
+
+app.use('/reset-password-token', resetPasswordTokenRoutes)
 
 
 //error handling middelwears

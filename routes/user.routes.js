@@ -60,4 +60,6 @@ route.post('/forgot-password', userController.forgotPassword)
 
 route.put('/reset-password', userController.resetPassword)
 
+route.put('/confirm-email/:id', userController.confirmEmail)
+
 module.exports = route

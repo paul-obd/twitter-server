@@ -13,12 +13,21 @@ POST http://localhost:3000/user/forgot-password HTTP/1.1
 Content-Type: application/json
 
 {
-    "email": "paul.bus.obd@gmail.com"
+    "email": "theresaobeid@hotmail.com"
 }
 
 ####
 
+GET http://localhost:3000/reset-password-token/one-token/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBhdWwub2JkQGhvdG1haWwuY29tIiwidXNlcklkIjoiNjIyY2Q4MzgzZTg4ZTA5ZTk5ZDU3MTBiIiwiaWF0IjoxNjQ3MjUyMjI5LCJleHAiOjE2NDcyNTI0Njl9.exOfvG-CeJl1lL2ZLqJAh6sQ33tUvugIcS3pIxcIVI4 HTTP/1.1
+####
 
+POST http://localhost:3000/reset-password-token/add-token HTTP/1.1
+Content-Type: application/json
+
+{
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6InBhdWwub2JkQGhvdG1haWwuY29tIiwidXNlcklkIjoiNjIyY2Q4MzgzZTg4ZTA5ZTk5ZDU3MTBiIiwiaWF0IjoxNjQ3MjUyMjI5LCJleHAiOjE2NDcyNTI0Njl9.exOfvG-CeJl1lL2ZLqJAh6sQ33tUvugIcS3pIxcIVI4"
+}
+####
 POST http://localhost:3000/user/signup HTTP/1.1
 Content-Type: application/json
 
