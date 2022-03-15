@@ -35,7 +35,7 @@ exports.signUp = async (req, res, next) => {
             userName: result.UserName
         },
             jwtSecret,
-            { expiresIn: '24h' }
+            { expiresIn: '1s' }
         )
 
         mailSender.sendEmail(result.email, "Confirm You email", "", 
@@ -55,6 +55,37 @@ exports.signUp = async (req, res, next) => {
     }
 }
 
+exports.resendConfirmationEmail = async (req, res, next)=>{
+    try {
+        const userEmail = req.params.email
+        const user = await User.findOne({email: userEmail})
+        if(!user){
+            let err = new Error('A user with this email could not be found! Please SignUp.')
+            err.statusCode = 404
+            throw err
+        }
+        const token = jwt.sign({
+            email: user.email,
+            userId: user._id,
+            userName: user.UserName
+        },
+            jwtSecret,
+            { expiresIn: '24h' }
+        )
+
+        mailSender.sendEmail(user.email, "Confirm You email", "", 
+        '<a href='+process.env.CLIENT+ 'account-verification'+'/'+token+'>Click this link to verify your account</a>'
+        )
+        res.status(201).send({ message: "Please check your email to verify Your Account", user: user })
+
+    } catch (err) {
+        if (!err.statusCode) {
+            err.statusCode = 500
+        }
+        next(err)
+    }
+}
+
 
 exports.logIn = async (req, res, next) => {
     try {
@@ -69,7 +100,19 @@ exports.logIn = async (req, res, next) => {
                 err.statusCode = 402
                 throw err
             }else if(user.activated == false){
-                let err = new Error('Your account is not activated! You have to confirm your email.')
+                const token = jwt.sign({
+                    email: user.email,
+                    userId: user._id,
+                    userName: user.UserName
+                },
+                    jwtSecret,
+                    { expiresIn: '24h' }
+                )
+        
+                mailSender.sendEmail(user.email, "Confirm You email", "", 
+                '<a href='+process.env.CLIENT+ 'account-verification'+'/'+token+'>Click this link to verify your account</a>'
+                )
+                let err = new Error('Your account is not activated! We sent you a confirmation link to your email, please check it.')
                 err.statusCode = 402
                 throw err
             }
@@ -81,7 +124,19 @@ exports.logIn = async (req, res, next) => {
                 err.statusCode = 401
                 throw err
             }else if(user.activated == false){
-                let err = new Error('Your account is not activated! You have to confirm your email.')
+                const token = jwt.sign({
+                    email: user.email,
+                    userId: user._id,
+                    userName: user.UserName
+                },
+                    jwtSecret,
+                    { expiresIn: '24h' }
+                )
+        
+                mailSender.sendEmail(user.email, "Confirm You email", "", 
+                '<a href='+process.env.CLIENT+ 'account-verification'+'/'+token+'>Click this link to verify your account</a>'
+                )
+                let err = new Error('Your account is not activated! We sent you a confirmation link to your email, please check it.')
                 err.statusCode = 402
                 throw err
             }
@@ -215,7 +270,7 @@ exports.confirmEmail = async (req, res, next)=>{
         const option = { new: true }
 
         const activatedUser = await User.findOneAndUpdate({_id: userId}, {activated: true}, option)
-        res.send({message: "Your Email is Confirmed Successfully! Please LogIn."})
+        res.send({message: "Your Email is Confirmed Successfully! Please LogIn.",user: user})
     } catch (err) {
         if (!err.statusCode) {
             err.statusCode = 500

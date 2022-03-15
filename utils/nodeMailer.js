@@ -26,17 +26,20 @@ exports.sendEmail = async (email, subject, text, html) => {
       service: 'gmail',
       auth: {
        // type: 'OAuth2',
-        user: process.env.EMAIL,
+        
+        user: 'paul.bus.obd@gmail.com',
         pass: 'melhem111'
+
         // clientId: CLIENT_ID,
         // clientSecret: CLEINT_SECRET,
         // refreshToken: REFRESH_TOKEN,
         // accessToken: accessToken,
-      }
+      },
+    
     });
 
     const mailOptions = {
-      from: 'Twitter from AliExpress <process.env.EMAIL>',
+      from: 'Twitter from AliExpress <paul.bus.obd@gmail.com>',
       to: email,
       subject: subject,
       text: text,
@@ -44,7 +47,7 @@ exports.sendEmail = async (email, subject, text, html) => {
     };
 
     const result = await transporter.sendMail(mailOptions);
-    console.log(result)
+
     return result
     
   }
