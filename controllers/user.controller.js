@@ -35,7 +35,7 @@ exports.signUp = async (req, res, next) => {
             userName: result.UserName
         },
             jwtSecret,
-            { expiresIn: '1s' }
+            { expiresIn: '24h' }
         )
 
         mailSender.sendEmail(result.email, "Confirm You email", "", 

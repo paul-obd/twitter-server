@@ -13,7 +13,7 @@ exports.getAllPosts = async (req, res, next) => {
             page = 1
         } 
         if(!size){
-            size = 6
+            size = 2
         }
 
         const limit = parseInt(size)
