@@ -37,6 +37,7 @@ const fileeFilter = (req, file, cb)=>{
 }
 
 //CORS middelwear
+app.options('/', cors())
 app.use(cors({
     origin: '*'
 }))
@@ -73,7 +74,7 @@ app.use((err, req, res, next)=>{
 })
 
 
-
+//DATABASE_NAME_IN_MONGO_ATLAS: all-about-nodeJs
 
 //connecting to db and statring the server
 mongoose.connect(process.env.DB).then(

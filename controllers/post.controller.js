@@ -8,18 +8,20 @@ const { validationResult } = require('express-validator')
 exports.getAllPosts = async (req, res, next) => {
     try {
 
+        
+
         let {page, size} = req.query;
         if(!page){
             page = 1
         } 
         if(!size){
-            size = 2
+            size = 4
         }
 
         const limit = parseInt(size)
         const skip = (page - 1) * size
 
-        const result = await Posts.find().limit(limit).skip(skip)
+        const result = await Posts.find().sort([['createdAt', -1]]).limit(limit).skip(skip)
         await result.forEach(tweet => {
             if (tweet.imageUrl) {
                 tweet.imageUrl = tweet.imageUrl.toString().replace(/\\/g, "/")
@@ -40,8 +42,8 @@ exports.getAllPosts = async (req, res, next) => {
                 title: post.title,
                 content: post.content,
                 creator: user,
-                createdAt: post.createdAt,
-                updatedAt: post.updatedAt
+                createdAt: (post.createdAt.getDate()+ '-'+post.createdAt.getMonth()+ '-'+ post.createdAt.getFullYear()),
+                updatedAt: post.updatedAt.toDateString()
                 
             }
             posts.push(newPost)
@@ -49,7 +51,7 @@ exports.getAllPosts = async (req, res, next) => {
             
         }
         
-
+       
         res.send(posts)
     } catch (err) {
         if (!err.statusCode) {
@@ -80,8 +82,8 @@ exports.getOnePost = async (req, res, next) => {
                 title: post.title,
                 content: post.content,
                 creator: user,
-                createdAt: post.createdAt,
-                updatedAt: post.updatedAt
+                createdAt: (post.createdAt.getDate()+ '-'+post.createdAt.getMonth()+ '-'+ post.createdAt.getFullYear()),
+                updatedAt: post.updatedAt.toDateString()
                 
             }
 

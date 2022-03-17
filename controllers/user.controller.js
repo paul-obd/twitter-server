@@ -38,8 +38,8 @@ exports.signUp = async (req, res, next) => {
             { expiresIn: '24h' }
         )
 
-        mailSender.sendEmail(result.email, "Confirm You email", "", 
-        '<a href='+process.env.CLIENT+ 'account-verification'+'/'+token+'>Click this link to verify your account</a>'
+        mailSender.sendEmail(result.email, "Confirm You email", "",
+            '<a href=' + process.env.CLIENT + 'account-verification' + '/' + token + '>Click this link to verify your account</a>'
         )
         res.status(201).send({ message: "Please check your email to verify Your Account", user: result })
 
@@ -55,11 +55,11 @@ exports.signUp = async (req, res, next) => {
     }
 }
 
-exports.resendConfirmationEmail = async (req, res, next)=>{
+exports.resendConfirmationEmail = async (req, res, next) => {
     try {
         const userEmail = req.params.email
-        const user = await User.findOne({email: userEmail})
-        if(!user){
+        const user = await User.findOne({ email: userEmail })
+        if (!user) {
             let err = new Error('A user with this email could not be found! Please SignUp.')
             err.statusCode = 404
             throw err
@@ -73,8 +73,8 @@ exports.resendConfirmationEmail = async (req, res, next)=>{
             { expiresIn: '24h' }
         )
 
-        mailSender.sendEmail(user.email, "Confirm You email", "", 
-        '<a href='+process.env.CLIENT+ 'account-verification'+'/'+token+'>Click this link to verify your account</a>'
+        mailSender.sendEmail(user.email, "Confirm You email", "",
+            '<a href=' + process.env.CLIENT + 'account-verification' + '/' + token + '>Click this link to verify your account</a>'
         )
         res.status(201).send({ message: "Please check your email to verify Your Account", user: user })
 
@@ -99,7 +99,7 @@ exports.logIn = async (req, res, next) => {
                 let err = new Error('A user with this email could not be found! Please SignUp.')
                 err.statusCode = 402
                 throw err
-            }else if(user.activated == false){
+            } else if (user.activated == false) {
                 const token = jwt.sign({
                     email: user.email,
                     userId: user._id,
@@ -108,9 +108,9 @@ exports.logIn = async (req, res, next) => {
                     jwtSecret,
                     { expiresIn: '24h' }
                 )
-        
-                mailSender.sendEmail(user.email, "Confirm You email", "", 
-                '<a href='+process.env.CLIENT+ 'account-verification'+'/'+token+'>Click this link to verify your account</a>'
+
+                mailSender.sendEmail(user.email, "Confirm You email", "",
+                    '<a href=' + process.env.CLIENT + 'account-verification' + '/' + token + '>Click this link to verify your account</a>'
                 )
                 let err = new Error('Your account is not activated! We sent you a confirmation link to your email, please check it.')
                 err.statusCode = 402
@@ -123,7 +123,7 @@ exports.logIn = async (req, res, next) => {
                 let err = new Error('A user with this username could not be found! Please SignUp')
                 err.statusCode = 401
                 throw err
-            }else if(user.activated == false){
+            } else if (user.activated == false) {
                 const token = jwt.sign({
                     email: user.email,
                     userId: user._id,
@@ -132,9 +132,9 @@ exports.logIn = async (req, res, next) => {
                     jwtSecret,
                     { expiresIn: '24h' }
                 )
-        
-                mailSender.sendEmail(user.email, "Confirm You email", "", 
-                '<a href='+process.env.CLIENT+ 'account-verification'+'/'+token+'>Click this link to verify your account</a>'
+
+                mailSender.sendEmail(user.email, "Confirm You email", "",
+                    '<a href=' + process.env.CLIENT + 'account-verification' + '/' + token + '>Click this link to verify your account</a>'
                 )
                 let err = new Error('Your account is not activated! We sent you a confirmation link to your email, please check it.')
                 err.statusCode = 402
@@ -186,10 +186,18 @@ exports.getUserProfile = async (req, res, next) => {
         for (let i = 0; i < result.posts.length; i++) {
             const post = result.posts[i];
             let currentPost = await Posts.findById(post)
+            // \/ parsing the document to an object \/
+            currentPost = currentPost.toObject()
             if (currentPost.imageUrl) {
-                currentPost.imageUrl = currentPost.imageUrl.toString().replace(/\\/g, "/")
-
+                currentPost.imageUrl = currentPost.imageUrl.replace(/\\/g, "/")
+              
             }
+
+
+            currentPost.createdAt = (currentPost.createdAt.getDate() + '-' + currentPost.createdAt.getMonth() + '-' + currentPost.createdAt.getFullYear()),
+                currentPost.updatedAt = currentPost.updatedAt.toDateString()
+
+
             userPosts.push(currentPost)
         }
 
@@ -201,7 +209,7 @@ exports.getUserProfile = async (req, res, next) => {
             email: result.email,
             password: result.password,
             userName: result.userName,
-            posts: userPosts,
+            posts: userPosts.reverse(),
             createdAt: result.createdAt,
             updatedAt: result.updatedAt
         })
@@ -230,10 +238,15 @@ exports.getOneUser = async (req, res, next) => {
         for (let i = 0; i < result.posts.length; i++) {
             const post = result.posts[i];
             let currentPost = await Posts.findById(post)
+            // \/ parsing the document to an object \/
+            currentPost = currentPost.toObject()
             if (currentPost.imageUrl) {
-                currentPost.imageUrl = currentPost.imageUrl.toString().replace(/\\/g, "/")
+                currentPost.imageUrl = currentPost.imageUrl.replace(/\\/g, "/")
 
             }
+            currentPost.createdAt = (currentPost.createdAt.getDate() + '-' + currentPost.createdAt.getMonth() + '-' + currentPost.createdAt.getFullYear())
+            currentPost.updatedAt = currentPost.updatedAt.toDateString()
+
             userPosts.push(currentPost)
         }
 
@@ -258,25 +271,25 @@ exports.getOneUser = async (req, res, next) => {
     }
 }
 
-exports.confirmEmail = async (req, res, next)=>{
+exports.confirmEmail = async (req, res, next) => {
     try {
         let userId = req.params.id
         const user = await User.findById(userId)
-        if(!user){
+        if (!user) {
             let err = new Error('You are not a registered user!')
             err.statusCode = 422
             throw err
         }
         const option = { new: true }
 
-        const activatedUser = await User.findOneAndUpdate({_id: userId}, {activated: true}, option)
-        res.send({message: "Your Email is Confirmed Successfully! Please LogIn.",user: user})
+        const activatedUser = await User.findOneAndUpdate({ _id: userId }, { activated: true }, option)
+        res.send({ message: "Your Email is Confirmed Successfully! Please LogIn.", user: user })
     } catch (err) {
         if (!err.statusCode) {
             err.statusCode = 500
         }
         next(err)
-        
+
     }
 }
 
@@ -304,13 +317,12 @@ exports.forgotPassword = async (req, res, next) => {
         mailSender.sendEmail(user.email, "Reset password",
             ('Hello' + user.UserName + '\n Kindly click the link below to reset your password'),
             ('<a href=' + process.env.CLIENT + "/reset-password/" + user._id + "/" + token + '>Click here to reset your password</a>')
-        ).then(result => 
-            res.send({message: 'Email was sent To: '+ result.envelope.to})
-        ).catch(error => 
-          {
-              let err = new Error('Email failed to be sent!')
-              throw err
-          } 
+        ).then(result =>
+            res.send({ message: 'Email was sent To: ' + result.envelope.to })
+        ).catch(error => {
+            let err = new Error('Email failed to be sent!')
+            throw err
+        }
         )
 
 
@@ -318,7 +330,7 @@ exports.forgotPassword = async (req, res, next) => {
 
     } catch (err) {
 
-        if(!err.statusCode){
+        if (!err.statusCode) {
             err.statusCode = 500
         }
         next(err)
@@ -326,26 +338,26 @@ exports.forgotPassword = async (req, res, next) => {
     }
 }
 
-exports.resetPassword = async (req, res, next)=>{
+exports.resetPassword = async (req, res, next) => {
     try {
         let userId = req.body.id
         const isUser = await User.findById(userId)
-        if(!isUser){
+        if (!isUser) {
             let err = new Error('Unvalid User!')
             err.statusCode = 404
             throw err
         }
-        
+
         const option = { new: true }
         let newPassword = await bcrypt.hash(req.body.password, 12)
-  
-        const userToBeUpdated = await User.findOneAndUpdate({_id: userId},{password: newPassword}, option )
-        res.send({message: "Your password has been reset successfully! You can LogIn now."})
+
+        const userToBeUpdated = await User.findOneAndUpdate({ _id: userId }, { password: newPassword }, option)
+        res.send({ message: "Your password has been reset successfully! You can LogIn now." })
     } catch (err) {
-        if(!err.statusCode){
+        if (!err.statusCode) {
             err.statusCode = 500
         }
         next(err)
-        
+
     }
 }
